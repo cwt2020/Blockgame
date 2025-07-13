@@ -34,13 +34,21 @@ function setupControls(gameState) {
         if (!GameState.controls) GameState.controls = {};
         GameState.controls.isDragging = true;
         GameState.controls.draggedPiece = gameState.availablePieces[index];
-        
-        const rect = e.target.getBoundingClientRect();
+
+        // Center the drag offset under the finger/touch
+        const piece = gameState.availablePieces[index];
+        const pieceRows = piece.shape.length;
+        const pieceCols = piece.shape[0].length;
+        const piecePixelWidth = pieceCols * gameState.CELL_SIZE;
+        const piecePixelHeight = pieceRows * gameState.CELL_SIZE;
         const startX = e.clientX || e.touches[0].clientX;
         const startY = e.clientY || e.touches[0].clientY;
-        
-        dragOffset = { x: startX - rect.left, y: startY - rect.top };
+        dragOffset = {
+            x: piecePixelWidth / 2,
+            y: piecePixelHeight / 2
+        };
 
+        const rect = e.target.getBoundingClientRect();
         gameState.selectionCanvases[index].ctx.clearRect(0, 0, rect.width, rect.height);
         createDragElement(gameState.availablePieces[index]);
         handleMove(e);
@@ -62,8 +70,8 @@ function setupControls(gameState) {
             const piece = gameState.availablePieces[selectedPieceIndex];
             const pieceRows = piece.shape.length;
             const pieceCols = piece.shape[0].length;
-            const row = gameState.ghostPos.y / gameState.CELL_SIZE;
-            const col = gameState.ghostPos.x / gameState.CELL_SIZE;
+            const row = Math.floor(gameState.ghostPos.y / gameState.CELL_SIZE);
+            const col = Math.floor(gameState.ghostPos.x / gameState.CELL_SIZE);
             if (isValidPlacement(gameState.grid, piece, row, col)) {
                 gameState.placeSelectedPiece(selectedPieceIndex, row, col);
                 isValidDrop = true;
@@ -87,38 +95,29 @@ function setupControls(gameState) {
     const handleMove = (e) => {
         if (!isDragging) return;
         e.preventDefault();
-        
-        let moveX = e.clientX || e.touches[0].clientX;
-        let moveY = e.clientY || e.touches[0].clientY;
-        // Constrain dragging to the viewport
-        const dragEl = dragContainer.firstChild;
-        if (dragEl) {
-            const elRect = dragEl.getBoundingClientRect();
-            moveX = Math.max(0, Math.min(moveX, window.innerWidth - elRect.width));
-            moveY = Math.max(0, Math.min(moveY, window.innerHeight - elRect.height));
+
+        let moveX = e.clientX || (e.touches && e.touches[0].clientX);
+        let moveY = e.clientY || (e.touches && e.touches[0].clientY);
+        dragContainer.style.transform = `translate(${moveX - dragOffset.x}px, ${moveY - dragOffset.y}px)`;
+
+        // Use the currently dragged piece for ghost calculation
+        const piece = GameState.controls.draggedPiece;
+        if (!piece) {
+            gameState.ghostPos = null;
+            gameState.drawMainGrid();
+            return;
         }
-        // The center of the piece is the reference for ghost and drop
-        const piece = gameState.availablePieces[selectedPieceIndex];
         const pieceRows = piece.shape.length;
         const pieceCols = piece.shape[0].length;
-        const piecePixelWidth = pieceCols * gameState.CELL_SIZE;
-        const piecePixelHeight = pieceRows * gameState.CELL_SIZE;
-        const draggedElX = moveX - dragOffset.x;
-        const draggedElY = moveY - dragOffset.y;
-        dragContainer.style.transform = `translate(${draggedElX}px, ${draggedElY}px)`;
-
         const mainCanvasRect = mainCanvas.getBoundingClientRect();
-        // Calculate intended row/col
-        let ghostX = draggedElX - mainCanvasRect.left + piecePixelWidth / 2;
-        let ghostY = draggedElY - mainCanvasRect.top + piecePixelHeight / 2;
+        let ghostX = moveX - mainCanvasRect.left;
+        let ghostY = moveY - mainCanvasRect.top;
         let row = Math.floor(ghostY / gameState.CELL_SIZE) - Math.floor(pieceRows / 2);
         let col = Math.floor(ghostX / gameState.CELL_SIZE) - Math.floor(pieceCols / 2);
-        // Clamp so piece fits in grid
         row = Math.max(0, Math.min(gameState.ROWS - pieceRows, row));
         col = Math.max(0, Math.min(gameState.COLS - pieceCols, col));
-        // Only show ghost if center of piece is over the grid
-        const centerOverGrid = ghostX >= 0 && ghostX < mainCanvasRect.width && ghostY >= 0 && ghostY < mainCanvasRect.height;
-        if (centerOverGrid) {
+        const overGrid = moveX >= mainCanvasRect.left && moveX < mainCanvasRect.right && moveY >= mainCanvasRect.top && moveY < mainCanvasRect.bottom;
+        if (overGrid) {
             gameState.ghostPos = {
                 x: col * gameState.CELL_SIZE,
                 y: row * gameState.CELL_SIZE

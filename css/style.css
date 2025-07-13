@@ -160,8 +160,11 @@ button:not(.control-btn):hover {
 /* --- Responsive Mobile Layout --- */
 @media (max-width: 600px) {
     #piece-selection-area {
-        flex-direction: column; /* Stack piece slots vertically */
-        gap: 20px; /* Add space between stacked slots */
+        flex-direction: row; /* Keep selection areas side by side on mobile */
+        gap: 14px;
         align-items: center;
+        justify-content: center;
+        width: auto;
+        max-width: 100vw;
     }
 }

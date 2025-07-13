@@ -33,7 +33,9 @@ const GameState = {
         this.renderer = new Renderer(this.CELL_SIZE);
         
         restartButton.addEventListener('click', () => this.start());
-        hintButton.addEventListener('click', () => this.showHint());
+        if (typeof hintButton !== 'undefined' && hintButton) {
+            hintButton.addEventListener('click', () => this.showHint());
+        }
         
         setupControls(this);
         this.start();
