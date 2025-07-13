@@ -160,11 +160,34 @@ button:not(.control-btn):hover {
 /* --- Responsive Mobile Layout --- */
 @media (max-width: 600px) {
     #piece-selection-area {
-        flex-direction: row; /* Keep selection areas side by side on mobile */
-        gap: 14px;
-        align-items: center;
-        justify-content: center;
-        width: auto;
-        max-width: 100vw;
+        display: flex !important;
+        flex-direction: row !important;
+        gap: 14px !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 100vw !important;
+        max-width: 100vw !important;
+        min-width: 0 !important;
+    }
+
+    #game-canvas {
+        width: 100vw !important;
+        max-width: 100vw !important;
+        height: auto !important;
+        min-width: 0;
+        display: block;
+        margin: 0 auto;
+    }
+
+    .piece-canvas {
+        width: 96px !important;
+        height: 96px !important;
+        max-width: 96px !important;
+        max-height: 96px !important;
+    }
+    .piece-slot {
+        width: 96px !important;
+        height: 96px !important;
+        min-width: 0;
     }
 }
