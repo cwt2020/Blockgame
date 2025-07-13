@@ -69,15 +69,22 @@ class Renderer {
     }
 
     drawPieceOnSelectionCanvas(piece, canvas, ctx) {
-        const scale = 0.8; // Scaled smaller
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset any transforms
+        ctx.clearRect(0, 0, canvas.width, canvas.height); // Strict clear
+        // Also clear when piece is removed (piece == null)
+        if (!piece) {
+            ctx.restore();
+            return;
+        }
+        const scale = .6; // Full size
         const size = this.CELL_SIZE * scale;
         const pieceWidth = piece.shape[0].length * size;
         const pieceHeight = piece.shape.length * size;
         const x = (canvas.width - pieceWidth) / 2;
         const y = (canvas.height - pieceHeight) / 2;
-        
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
         // The centered rotation is handled by this calculation automatically
         this.drawPiece(ctx, piece, x, y, scale);
+        ctx.restore();
     }
 }

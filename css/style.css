@@ -37,9 +37,9 @@ body {
     justify-content: center;
     align-items: center;
     margin-top: 15px;
-    width: 360px;
+    width: 272px;
     max-width: 100vw;
-    gap: 14px;
+    gap: 24px;
 }
 
 .piece-slot {

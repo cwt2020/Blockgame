@@ -26,8 +26,7 @@ const GameState = {
         
         this.selectionCanvases = [
             { canvas: document.getElementById('piece-canvas-0'), ctx: document.getElementById('piece-canvas-0').getContext('2d')},
-            { canvas: document.getElementById('piece-canvas-1'), ctx: document.getElementById('piece-canvas-1').getContext('2d')},
-            { canvas: document.getElementById('piece-canvas-2'), ctx: document.getElementById('piece-canvas-2').getContext('2d')}
+            { canvas: document.getElementById('piece-canvas-1'), ctx: document.getElementById('piece-canvas-1').getContext('2d')}
         ];
         this.selectionCanvases.forEach(c => { c.canvas.width = 4 * this.CELL_SIZE; c.canvas.height = 4 * this.CELL_SIZE; });
         
@@ -118,7 +117,7 @@ const GameState = {
 
     // --- Other methods (generateNewPieces, createRandomPiece, isPiecePlayable, checkGameOver, showHint) remain largely the same ---
     generateNewPieces() {
-        this.availablePieces = [this.createRandomPiece(), this.createRandomPiece(), this.createRandomPiece()];
+        this.availablePieces = [this.createRandomPiece(), this.createRandomPiece()];
         if (!this.availablePieces.some(p => this.isPiecePlayable(p)) && !this.checkGameOver()) {
             this.generateNewPieces();
         }
