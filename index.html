@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Block Game | Rev 5</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="drag-container"></div>
+    <div class="game-container">
+        <h1>Block Game</h1>
+        <div class="hud">
+            <span>Score: <span id="score">0</span></span>
+            <button id="hint-button">Hint 💡</button>
+        </div>
+        <canvas id="game-canvas"></canvas>
+        <div id="piece-selection-area">
+            <div class="piece-slot" id="slot-0">
+                <canvas id="piece-canvas-0" class="piece-canvas"></canvas>
+                <div class="piece-controls">
+                    <button class="control-btn rotate-btn" data-piece-index="0">⟳</button>
+                    <button class="control-btn mirror-btn" data-piece-index="0">⇄</button>
+                </div>
+            </div>
+            <div class="piece-slot" id="slot-1">
+                <canvas id="piece-canvas-1" class="piece-canvas"></canvas>
+                <div class="piece-controls">
+                    <button class="control-btn rotate-btn" data-piece-index="1">⟳</button>
+                    <button class="control-btn mirror-btn" data-piece-index="1">⇄</button>
+                </div>
+            </div>
+            <div class="piece-slot" id="slot-2">
+                <canvas id="piece-canvas-2" class="piece-canvas"></canvas>
+                <div class="piece-controls">
+                    <button class="control-btn rotate-btn" data-piece-index="2">⟳</button>
+                    <button class="control-btn mirror-btn" data-piece-index="2">⇄</button>
+                </div>
+            </div>
+        </div>
+        <div id="game-over-screen" class="hidden">
+            <h2>Game Over</h2>
+            <p>Final Score: <span id="final-score">0</span></p>
+            <button id="restart-button">Play Again</button>
+        </div>
+    </div>
+
+    <script src="js/pieces.js"></script>
+    <script src="js/grid.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/controls.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
