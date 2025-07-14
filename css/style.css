@@ -8,7 +8,8 @@ body {
     height: 100vh;
     margin: 0;
     touch-action: none;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
 }
 
 .game-container {
@@ -34,10 +35,12 @@ body {
 
 #piece-selection-area {
     display: flex;
+    flex-direction: row;
     justify-content: center;
     align-items: center;
-    margin-top: 15px;
-    width: 272px;
+    margin: 0 auto;
+    margin-top: 16px;
+    width: 280px;
     max-width: 100vw;
     gap: 24px;
 }
@@ -55,6 +58,8 @@ body {
     position: relative;
     width: 128px;
     height: 128px;
+    min-width: 128px;
+    min-height: 128px;
 }
 
 .piece-controls {
@@ -62,7 +67,9 @@ body {
     top: 2px;
     display: flex;
     gap: 0;
-    background: none;
+    background: #333;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    border-radius: 10px;
     box-shadow: none;
     z-index: 2;
     width: 100%;
@@ -92,6 +99,8 @@ body {
     height: 128px;
     max-width: 128px;
     max-height: 128px;
+    min-width: 128px;
+    min-height: 128px;
     z-index: 1;
 }
 
@@ -162,32 +171,66 @@ button:not(.control-btn):hover {
     #piece-selection-area {
         display: flex !important;
         flex-direction: row !important;
-        gap: 14px !important;
-        align-items: center !important;
         justify-content: center !important;
-        width: 100vw !important;
+        align-items: center !important;
+        margin: 0 auto !important;
+        margin-top: 16px !important;
+        width: 280px !important;
         max-width: 100vw !important;
-        min-width: 0 !important;
+        gap: 16px !important;
+        padding-bottom: 2vh !important;
     }
 
     #game-canvas {
-        width: 100vw !important;
+        width: 280px !important;
         max-width: 100vw !important;
         height: auto !important;
         min-width: 0;
         display: block;
-        margin: 0 auto;
+        margin: 0 auto 2vh auto;
+        border-radius: 8px;
+        box-shadow: 0 2px 16px rgba(0,0,0,0.3);
     }
 
     .piece-canvas {
-        width: 96px !important;
-        height: 96px !important;
-        max-width: 96px !important;
-        max-height: 96px !important;
+        width: 128px !important;
+        height: 128px !important;
+        max-width: 128px !important;
+        max-height: 128px !important;
+        min-width: 128px !important;
+        min-height: 128px !important;
+        border-radius: 8px;
     }
     .piece-slot {
-        width: 96px !important;
-        height: 96px !important;
-        min-width: 0;
+        width: 128px !important;
+        height: 128px !important;
+        min-width: 128px !important;
+        min-height: 128px !important;
+        padding: 0 !important;
+    }
+
+    .piece-controls {
+        top: 8px;
+        gap: 8px;
+    }
+    .control-btn {
+        font-size: 7vw !important;
+        width: 10vw !important;
+        height: 10vw !important;
+        min-width: 40px;
+        min-height: 40px;
+        border-radius: 8px;
+    }
+    .hud {
+        font-size: 1.5em !important;
+        margin-bottom: 2vh !important;
+    }
+    h1 {
+        font-size: 2em !important;
+        margin-bottom: 2vh !important;
+    }
+    #game-over-screen {
+        padding: 24px !important;
+        font-size: 1.2em !important;
     }
 }

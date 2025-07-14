@@ -35,17 +35,19 @@ function setupControls(gameState) {
         GameState.controls.isDragging = true;
         GameState.controls.draggedPiece = gameState.availablePieces[index];
 
-        // Center the drag offset under the finger/touch
+        // Calculate offset from finger/touch to top-left of piece
         const piece = gameState.availablePieces[index];
         const pieceRows = piece.shape.length;
         const pieceCols = piece.shape[0].length;
         const piecePixelWidth = pieceCols * gameState.CELL_SIZE;
         const piecePixelHeight = pieceRows * gameState.CELL_SIZE;
-        const startX = e.clientX || e.touches[0].clientX;
-        const startY = e.clientY || e.touches[0].clientY;
+        const startX = e.clientX || (e.touches && e.touches[0].clientX);
+        const startY = e.clientY || (e.touches && e.touches[0].clientY);
+        // Find the slot position
+        const slotRect = e.target.getBoundingClientRect();
         dragOffset = {
-            x: piecePixelWidth / 2,
-            y: piecePixelHeight / 2
+            x: startX - slotRect.left,
+            y: startY - slotRect.top
         };
 
         const rect = e.target.getBoundingClientRect();
@@ -57,15 +59,8 @@ function setupControls(gameState) {
     const handleEnd = (e) => {
         if (!isDragging) return;
         
-        const mainCanvasRect = mainCanvas.getBoundingClientRect();
-        const endX = (e.clientX || e.changedTouches[0].clientX);
-        const endY = (e.clientY || e.changedTouches[0].clientY);
-        
-        const onGrid = endX > mainCanvasRect.left && endX < mainCanvasRect.right &&
-                       endY > mainCanvasRect.top && endY < mainCanvasRect.bottom;
-        
         let isValidDrop = false;
-        // Only drop if ghost is visible (piece is over grid)
+        // Only drop if ghost is visible and placement is valid
         if (gameState.ghostPos) {
             const piece = gameState.availablePieces[selectedPieceIndex];
             const pieceRows = piece.shape.length;
@@ -77,7 +72,7 @@ function setupControls(gameState) {
                 isValidDrop = true;
             }
         }
-        
+
         if (!isValidDrop) {
             snapBack(selectedPieceIndex);
         } else {
@@ -110,14 +105,43 @@ function setupControls(gameState) {
         const pieceRows = piece.shape.length;
         const pieceCols = piece.shape[0].length;
         const mainCanvasRect = mainCanvas.getBoundingClientRect();
-        let ghostX = moveX - mainCanvasRect.left;
-        let ghostY = moveY - mainCanvasRect.top;
-        let row = Math.floor(ghostY / gameState.CELL_SIZE) - Math.floor(pieceRows / 2);
-        let col = Math.floor(ghostX / gameState.CELL_SIZE) - Math.floor(pieceCols / 2);
+        // Calculate the top-left of the piece relative to the grid
+        let ghostX = moveX - dragOffset.x - mainCanvasRect.left;
+        let ghostY = moveY - dragOffset.y - mainCanvasRect.top;
+        let row = Math.round(ghostY / gameState.CELL_SIZE);
+        let col = Math.round(ghostX / gameState.CELL_SIZE);
+        // Clamp so piece fits in grid
         row = Math.max(0, Math.min(gameState.ROWS - pieceRows, row));
         col = Math.max(0, Math.min(gameState.COLS - pieceCols, col));
-        const overGrid = moveX >= mainCanvasRect.left && moveX < mainCanvasRect.right && moveY >= mainCanvasRect.top && moveY < mainCanvasRect.bottom;
-        if (overGrid) {
+
+        // Check if any part of the block is still overlapping the selection canvas
+        let selectionRect = null;
+        if (selectedPieceIndex >= 0 && gameState.selectionCanvases[selectedPieceIndex]) {
+            selectionRect = gameState.selectionCanvases[selectedPieceIndex].canvas.getBoundingClientRect();
+        }
+        let blockOverSelection = false;
+        if (selectionRect) {
+            for (let r = 0; r < pieceRows; r++) {
+                for (let c = 0; c < pieceCols; c++) {
+                    if (piece.shape[r][c]) {
+                        // Calculate block cell position in screen coordinates
+                        const cellX = mainCanvasRect.left + (col + c) * gameState.CELL_SIZE;
+                        const cellY = mainCanvasRect.top + (row + r) * gameState.CELL_SIZE;
+                        if (
+                            cellX + gameState.CELL_SIZE > selectionRect.left &&
+                            cellX < selectionRect.right &&
+                            cellY + gameState.CELL_SIZE > selectionRect.top &&
+                            cellY < selectionRect.bottom
+                        ) {
+                            blockOverSelection = true;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Show ghost only if placement is valid and block is not overlapping selection canvas
+        if (isValidPlacement(gameState.grid, piece, row, col) && !blockOverSelection) {
             gameState.ghostPos = {
                 x: col * gameState.CELL_SIZE,
                 y: row * gameState.CELL_SIZE
